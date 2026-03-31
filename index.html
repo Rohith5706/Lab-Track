@@ -5,10 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LabTrack — RFID Attendance System</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700;800&display=swap"
-    rel="stylesheet">
-  <!-- Link to your external CSS file -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -41,7 +38,6 @@
         <input class="login-input" type="password" id="login-pass" placeholder="Enter password" />
       </div>
       <button class="login-btn" onclick="doLogin()">Sign In →</button>
-      <!-- Fixed Error Message: No longer shows the real password -->
       <div class="login-error" id="login-error">Invalid credentials. Please try again.</div>
     </div>
   </div>
@@ -67,7 +63,7 @@
         </button>
         <div class="nav-section-label">Reports</div>
         <button class="nav-item" onclick="showPage('reports',this)">
-          <span class="nav-icon">📈</span> Reports & Export
+          <span class="nav-icon">📈</span> Reports
         </button>
       </nav>
       <div class="sidebar-footer">
@@ -124,7 +120,6 @@
         </div>
 
         <div class="dashboard-grid">
-          <!-- Recent Activity -->
           <div class="card">
             <div class="card-header">
               <div>
@@ -133,12 +128,9 @@
               </div>
               <div class="card-badge">Today</div>
             </div>
-            <div class="activity-list" id="activity-list">
-              <!-- Populated by JS -->
-            </div>
+            <div class="activity-list" id="activity-list"></div>
           </div>
 
-          <!-- Lab Status -->
           <div class="card">
             <div class="card-header">
               <div>
@@ -157,9 +149,7 @@
               <div class="capacity-labels">
                 <span>0</span><span id="capacity-text">0 / 30</span><span>30</span>
               </div>
-              <div class="present-list" id="present-list">
-                <!-- Populated by JS -->
-              </div>
+              <div class="present-list" id="present-list"></div>
             </div>
           </div>
         </div>
@@ -170,8 +160,7 @@
         <div class="filter-bar">
           <div class="filter-group">
             <label class="filter-label">Search Student</label>
-            <input class="filter-input" type="text" placeholder="Name or Roll No." id="filter-search"
-              oninput="filterTable()">
+            <input class="filter-input" type="text" placeholder="Name or Roll No." id="filter-search" oninput="filterTable()">
           </div>
           <div class="filter-group">
             <label class="filter-label">Status</label>
@@ -182,7 +171,6 @@
             </select>
           </div>
           <button class="filter-btn primary" onclick="filterTable()">Apply Filters</button>
-          <button class="filter-btn secondary" onclick="resetFilters()">Reset</button>
         </div>
 
         <div class="table-card">
@@ -191,7 +179,6 @@
               <h2>Attendance Records</h2>
               <p id="record-count">Showing 0 records</p>
             </div>
-            <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
           </div>
           <div style="overflow-x:auto;">
             <table>
@@ -206,9 +193,7 @@
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody id="attendance-tbody">
-                <!-- Populated by JS -->
-              </tbody>
+              <tbody id="attendance-tbody"></tbody>
             </table>
           </div>
         </div>
@@ -220,10 +205,9 @@
           <div class="rfid-scanner-card" id="rfid-scanner-card">
             <span class="rfid-big-icon">📡</span>
             <div class="rfid-scanner-title">RFID Scanner — Node 1</div>
-            <div class="rfid-scanner-sub">Tap your student ID card on the reader, or enter the card ID manually below
-            </div>
+            <div class="rfid-scanner-sub">Tap card or enter UID manually</div>
             <div class="rfid-manual-input">
-              <input type="text" id="rfid-card-input" placeholder="Card UID (e.g. A3F2C1)" maxlength="12">
+              <input type="text" id="rfid-card-input" placeholder="Card UID" maxlength="12">
               <button class="rfid-submit-btn" onclick="processRFID()">Log Entry</button>
             </div>
           </div>
@@ -253,14 +237,13 @@
         </div>
       </div>
 
-      <!-- REPORTS PAGE (Empty placeholder for now) -->
+      <!-- REPORTS PAGE -->
       <div class="page" id="page-reports">
         <div class="table-card" style="padding: 24px; text-align: center;">
           <h2>Reports Hub</h2>
-          <p>Data linked to Google Sheets. Use the Attendance tab to export current session data.</p>
+          <p>For data export, please access the Google Sheet linked to the system.</p>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -273,7 +256,6 @@
     </div>
   </div>
 
-  <!-- Link to your external JS file -->
   <script src="script.js"></script>
 </body>
 
