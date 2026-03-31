@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LabTrack — RFID Attendance System</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- Link to your external CSS file -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <div class="login-bg-pattern"></div>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-icon">🔬</div>
+        <div class="login-logo-text">Lab<span>Track</span></div>
+      </div>
+      <div class="login-title">Welcome back</div>
+      <div class="login-sub">Sign in to the RFID Attendance Portal</div>
+
+      <div class="login-field">
+        <label class="login-label">Login As</label>
+        <div class="login-role-group">
+          <button class="role-btn active" onclick="selectRole(this,'admin')">🧑‍💻 Lab Admin</button>
+          <button class="role-btn" onclick="selectRole(this,'hod')">👨‍🏫 HOD / Faculty</button>
+        </div>
+      </div>
+      <div class="login-field">
+        <label class="login-label">Username</label>
+        <input class="login-input" type="text" id="login-user" placeholder="Enter username" />
+      </div>
+      <div class="login-field">
+        <label class="login-label">Password</label>
+        <input class="login-input" type="password" id="login-pass" placeholder="Enter password" />
+      </div>
+      <button class="login-btn" onclick="doLogin()">Sign In →</button>
+      <!-- Fixed Error Message: No longer shows the real password -->
+      <div class="login-error" id="login-error">Invalid credentials. Please try again.</div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🔬</div>
+        <div class="sidebar-logo-name">Lab<span>Track</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <button class="nav-item active" onclick="showPage('dashboard',this)">
+          <span class="nav-icon">📊</span> Dashboard
+        </button>
+        <button class="nav-item" onclick="showPage('attendance',this)">
+          <span class="nav-icon">📋</span> Attendance Records
+        </button>
+        <button class="nav-item" onclick="showPage('rfid',this)">
+          <span class="nav-icon">📡</span> RFID Scanner
+        </button>
+        <div class="nav-section-label">Reports</div>
+        <button class="nav-item" onclick="showPage('reports',this)">
+          <span class="nav-icon">📈</span> Reports & Export
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-card">
+          <div class="user-avatar" id="sidebar-avatar">A</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebar-name">Lab Admin</div>
+            <div class="user-role" id="sidebar-role">Administrator</div>
+          </div>
+          <button class="logout-btn" onclick="doLogout()" title="Logout">⏏</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <h1 id="page-title">Dashboard</h1>
+          <p id="page-sub">IoT Lab</p>
+        </div>
+        <div class="topbar-right">
+          <div class="live-badge">
+            <div class="live-dot"></div> Live
+          </div>
+          <div class="topbar-time" id="clock">--:--:--</div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD PAGE -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon blue">👥</div>
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Total Students</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon green">✅</div>
+            <div class="stat-value" id="stat-present">0</div>
+            <div class="stat-label">Currently in Lab</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-icon red">🚪</div>
+            <div class="stat-value" id="stat-exited">0</div>
+            <div class="stat-label">Exited Today</div>
+          </div>
+          <div class="stat-card amber">
+            <div class="stat-icon amber">📡</div>
+            <div class="stat-value" id="stat-scans">0</div>
+            <div class="stat-label">Total Scans Today</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Recent Activity -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Recent RFID Activity</div>
+                <div class="card-sub">Live scan events</div>
+              </div>
+              <div class="card-badge">Today</div>
+            </div>
+            <div class="activity-list" id="activity-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Lab Status -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Lab Status</div>
+                <div class="card-sub">IoT Lab — Capacity: 30</div>
+              </div>
+            </div>
+            <div class="lab-status">
+              <div>
+                <div class="currently-in-count" id="in-count">0</div>
+                <div class="currently-in-label">students currently inside</div>
+              </div>
+              <div class="capacity-bar">
+                <div class="capacity-fill" id="capacity-fill" style="width:0%"></div>
+              </div>
+              <div class="capacity-labels">
+                <span>0</span><span id="capacity-text">0 / 30</span><span>30</span>
+              </div>
+              <div class="present-list" id="present-list">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATTENDANCE TABLE PAGE -->
+      <div class="page" id="page-attendance">
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label class="filter-label">Search Student</label>
+            <input class="filter-input" type="text" placeholder="Name or Roll No." id="filter-search"
+              oninput="filterTable()">
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select class="filter-select" id="filter-status" onchange="filterTable()">
+              <option value="">All</option>
+              <option value="present">Currently In Lab</option>
+              <option value="left">Exited</option>
+            </select>
+          </div>
+          <button class="filter-btn primary" onclick="filterTable()">Apply Filters</button>
+          <button class="filter-btn secondary" onclick="resetFilters()">Reset</button>
+        </div>
+
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="table-toolbar-left">
+              <h2>Attendance Records</h2>
+              <p id="record-count">Showing 0 records</p>
+            </div>
+            <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Student</th>
+                  <th>Roll No.</th>
+                  <th>In Time</th>
+                  <th>Out Time</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="attendance-tbody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RFID SCANNER PAGE -->
+      <div class="page" id="page-rfid">
+        <div class="rfid-page-container">
+          <div class="rfid-scanner-card" id="rfid-scanner-card">
+            <span class="rfid-big-icon">📡</span>
+            <div class="rfid-scanner-title">RFID Scanner — Node 1</div>
+            <div class="rfid-scanner-sub">Tap your student ID card on the reader, or enter the card ID manually below
+            </div>
+            <div class="rfid-manual-input">
+              <input type="text" id="rfid-card-input" placeholder="Card UID (e.g. A3F2C1)" maxlength="12">
+              <button class="rfid-submit-btn" onclick="processRFID()">Log Entry</button>
+            </div>
+          </div>
+          <div class="scan-result-card" id="scan-result-card">
+            <div class="scan-result-header">
+              <div class="scan-result-avatar" id="sr-avatar">R</div>
+              <div>
+                <div class="scan-result-name" id="sr-name">—</div>
+                <div class="scan-result-roll" id="sr-roll">—</div>
+              </div>
+            </div>
+            <div class="scan-result-grid">
+              <div class="scan-result-field">
+                <div class="scan-result-field-label">Action</div>
+                <div class="scan-result-field-val" id="sr-action">—</div>
+              </div>
+              <div class="scan-result-field">
+                <div class="scan-result-field-label">Time</div>
+                <div class="scan-result-field-val" id="sr-time">—</div>
+              </div>
+              <div class="scan-result-field">
+                <div class="scan-result-field-label">Card UID</div>
+                <div class="scan-result-field-val" id="sr-uid">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS PAGE (Empty placeholder for now) -->
+      <div class="page" id="page-reports">
+        <div class="table-card" style="padding: 24px; text-align: center;">
+          <h2>Reports Hub</h2>
+          <p>Data linked to Google Sheets. Use the Attendance tab to export current session data.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCAN TOAST -->
+  <div class="scan-toast" id="scan-toast">
+    <div class="scan-toast-icon" id="toast-icon">✅</div>
+    <div class="scan-toast-info">
+      <div class="scan-toast-title" id="toast-title">Card Scanned</div>
+      <div class="scan-toast-sub" id="toast-sub">Student logged in</div>
+    </div>
+  </div>
+
+  <!-- Link to your external JS file -->
+  <script src="script.js"></script>
+</body>
+
+</html>
