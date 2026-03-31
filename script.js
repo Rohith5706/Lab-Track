@@ -28,12 +28,47 @@ function safeParseDate(dateStr) {
 }
 
 // --- NEW HELPER: CHECK IF A DATE IS EXACTLY "TODAY" ---
+// --- FIX 1: DEFINE "TODAY" BASED ON THE DATA, NOT YOUR LAPTOP ---
 function isToday(d) {
   if (!d || isNaN(d)) return false;
-  const today = new Date();
-  return d.getDate() === today.getDate() &&
-         d.getMonth() === today.getMonth() &&
-         d.getFullYear() === today.getFullYear();
+  
+  // If there is no data at all, just return true
+  if (attendanceData.length === 0) return true;
+  
+  // We look at the date of the very FIRST (newest) record in your Sheet
+  // This ensures "Recent Activity" always shows the most current day available
+  const newestRecordDate = attendanceData[0].inTime; 
+  
+  return d.getDate() === newestRecordDate.getDate() &&
+         d.getMonth() === newestRecordDate.getMonth() &&
+         d.getFullYear() === newestRecordDate.getFullYear();
+}
+
+// --- FIX 2: UPDATE DASHBOARD STATS USING THE DATA'S DATE ---
+function updateDashboardStats() {
+  // Live count of everyone currently marked as 'present'
+  const presentCount = attendanceData.filter(r => r.status === 'present').length;
+  
+  // Use the date from the latest scan as our "Reference Day"
+  const referenceDate = attendanceData.length > 0 ? attendanceData[0].inTime : new Date();
+  
+  // Filter counts based on that reference date instead of your laptop's clock
+  const exitCountToday = attendanceData.filter(r => 
+    r.status === 'left' && 
+    r.outTime && 
+    r.outTime.toDateString() === referenceDate.toDateString()
+  ).length;
+  
+  let scansToday = 0;
+  attendanceData.forEach(r => {
+    if(r.inTime && r.inTime.toDateString() === referenceDate.toDateString()) scansToday++;
+    if(r.outTime && r.outTime.toDateString() === referenceDate.toDateString()) scansToday++;
+  });
+
+  document.getElementById('stat-total').textContent = students.length;
+  document.getElementById('stat-present').textContent = presentCount;
+  document.getElementById('stat-exited').textContent = exitCountToday;
+  document.getElementById('stat-scans').textContent = scansToday; 
 }
 
 // ── FETCH DATA FROM GOOGLE SHEETS ──
